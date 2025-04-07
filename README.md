@@ -100,7 +100,7 @@ nlohmann-json==3.11.2  # 用于JSON处理
 ```python
 fbx_files = [
     r"D:/work/Maya/CharacterFactory/resources/trump.fbx",
-    r"D:/work/Maya/CharacterFactory/resources/bigear.fbx",
+    r"D:/work/Maya/CharacterFactory/resources/bge.fbx",
     r"D:/work/Maya/CharacterFactory/resources/cooper.fbx",
     r"D:/work/Maya/CharacterFactory/resources/farrukh.fbx"
 ]
