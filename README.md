@@ -10,7 +10,7 @@
 Character-creator 是一个 Maya 插件，用于处理角色相关的操作，主要功能包括：
 
 - cmake一键构建maya插件
-- 处理多个 FBX 文件并提取顶点数据,创建 BlendShape 节点,通过调整blendshape的权重通过融合的方式来实现制作新角色
+- 处理多个 FBX 文件并提取顶点数据,创建 BlendShape 节点
 - 计算不同 FBX 文件之间的网格差异
 - 读取权重 JSON 文件进行调整
 
