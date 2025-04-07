@@ -1,0 +1,144 @@
+# CharacterFactory Maya Plugin
+
+"""持续更新中"""
+
+[![Maya 2022](https://img.shields.io/badge/Maya-2022-blue.svg)](https://www.autodesk.com/products/maya/overview)
+[![FBX SDK 2020.3.7](https://img.shields.io/badge/FBX%20SDK-2020.3.7-orange.svg)](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-3)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)](https://www.python.org/)
+[![Visual Studio 2022](https://img.shields.io/badge/Visual%20Studio-2022-purple.svg)](https://visualstudio.microsoft.com/)
+
+CharacterFactory 是一个 Maya 插件，用于处理角色相关的操作，主要功能包括：
+
+- cmake一键构建maya插件
+- 处理多个 FBX 文件并提取顶点数据,创建 BlendShape 节点,通过调整blendshape的权重通过融合的方式来实现制作新角色
+- 计算不同 FBX 文件之间的网格差异
+- 读取权重 JSON 文件进行调整
+
+## 项目结构
+
+```
+CharacterFactory/
+├── api/                    # C++插件源代码
+│   ├── src/               # 源文件
+│   ├── include/           # 头文件
+│   └── build/             # 构建目录
+├── scripts/               # Python脚本
+│   ├── build.py          # 构建相关
+│   ├── maya/             # Maya相关
+│   │   ├── process.py    # Maya进程管理
+│   │   └── plugins.py    # 插件管理
+│   └── config/           # 配置相关
+│       └── settings.py   # 配置文件
+├── third_party/          # 第三方库
+│   └── FbxSdk/          # Autodesk FBX SDK
+├── plug-ins/             # Maya插件目录
+└── setup.py             # 主安装脚本
+```
+
+## 环境要求
+
+### 软件要求
+- **Maya 2022**：主要运行环境，需安装在默认路径或在配置中指定
+- **Python 3.12**：用于运行脚本和构建过程
+- **Visual Studio 2022**：用于编译C++插件（需包含C++桌面开发工作负载）
+- **CMake 3.28.1+**：用于构建系统（Visual Studio 2022自带）
+- **Autodesk FBX SDK 2020.3.7**：用于FBX文件处理
+
+## 依赖项
+
+### Python 依赖
+```
+psutil==7.0.0  # 用于Maya进程管理
+nlohmann-json==3.11.2  # 用于JSON处理
+```
+
+### C++ 依赖
+- **Maya API**：用于与Maya交互
+- **FBX SDK**：用于FBX文件处理
+- **nlohmann/json**：用于C++中的JSON处理（已包含在项目中）
+
+## 安装步骤
+
+### 自动安装
+1. 确保已安装所有环境要求中列出的软件
+2. 克隆或下载此仓库到本地
+3. 安装Python依赖：
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. 运行安装脚本：
+   ```bash
+   py setup.py
+   ```
+
+   此脚本会自动执行以下操作：
+   - 构建C++插件
+   - 关闭当前运行的Maya（如果有）
+   - 将插件复制到Maya插件目录
+   - 启动Maya
+
+### 手动安装
+1. 使用CMake构建C++插件：
+   ```bash
+   cd api
+   mkdir build
+   cd build
+   cmake ..
+   cmake --build . --config Release
+   ```
+2. 将生成的 `CharacterFactory.mll` 复制到Maya插件目录：
+   - 默认路径：`C:\Program Files\Autodesk\Maya2022\bin\plug-ins`
+   - 或用户路径：`%USERPROFILE%\Documents\maya\2022\plug-ins`
+3. 启动Maya并加载插件
+
+## 使用方法
+
+### 在Maya中直接使用
+
+在Maya的脚本编辑器中执行以下Python代码：
+
+```python
+# 加载插件
+import maya.cmds as cmds
+import maya.OpenMaya as om
+
+# 确保插件已加载
+if not cmds.pluginInfo("CharacterFactory.mll", query=True, loaded=True):
+    cmds.loadPlugin("CharacterFactory.mll")
+
+# 使用插件功能处理多个FBX文件
+fbx_files = [
+    r"path/to/first.fbx",
+    r"path/to/second.fbx",
+    r"path/to/third.fbx"
+]
+fbx_files_str = ";".join(fbx_files)  # 使用分号连接多个文件路径
+output_path = r"path/to/output.fbx"  # 输出FBX文件路径
+json_path = r"path/to/weights.json"  # 权重JSON文件路径
+
+# 调用插件命令
+cmds.characterfactoryfbxhandle(fbx_files_str, output_path, json_path)
+```
+
+### 使用提供的Python脚本
+
+项目提供了 `launch.py` 脚本，可以更简单地调用插件功能：
+
+```python
+# 导入脚本
+import sys
+sys.path.append(r"path/to/CharacterFactory")  # 添加项目路径
+import launch
+
+# 设置文件路径
+fbx_files = [
+    r"path/to/first.fbx",
+    r"path/to/second.fbx",
+    r"path/to/third.fbx"
+]
+output_path = r"path/to/output.fbx"
+json_path = r"path/to/weights.json"
+
+# 调用函数
+launch.characterfactoryfbxhandle(fbx_files, output_path, json_path)
+```

@@ -1,0 +1,2 @@
+D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/Release/Commands.obj
+D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/Release/FbxHandle.obj

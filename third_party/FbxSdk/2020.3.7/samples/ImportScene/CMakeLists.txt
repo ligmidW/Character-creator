@@ -1,0 +1,55 @@
+project(ImportScene LANGUAGES CXX)
+
+SET(FBX_TARGET_SOURCE
+    DisplayAnimation.cxx
+    DisplayCache.cxx
+    DisplayCamera.cxx
+    DisplayCommon.cxx
+    DisplayGenericInfo.cxx
+    DisplayGlobalSettings.cxx
+    DisplayHierarchy.cxx
+    DisplayLight.cxx
+    DisplayLink.cxx
+    DisplayMarker.cxx
+    DisplayMaterial.cxx
+    DisplayMesh.cxx
+    DisplayNurb.cxx
+    DisplayPatch.cxx
+    DisplayLodGroup.cxx
+    DisplayPivotsAndLimits.cxx
+    DisplayPose.cxx
+    DisplayShape.cxx
+    DisplaySkeleton.cxx
+    DisplayTexture.cxx
+    DisplayUserProperties.cxx
+    main.cxx
+    DisplayAnimation.h
+    DisplayCache.h
+    DisplayCamera.h
+    DisplayCommon.h
+    DisplayGenericInfo.h
+    DisplayGlobalSettings.h
+    DisplayHierarchy.h
+    DisplayLight.h
+    DisplayLink.h
+    DisplayMarker.h
+    DisplayMaterial.h
+    DisplayMesh.h
+    DisplayNurb.h
+    DisplayPatch.h
+    DisplayLodGroup.h
+    DisplayPivotsAndLimits.h
+    DisplayPose.h
+    DisplayShape.h
+    DisplaySkeleton.h
+    DisplayTexture.h
+    DisplayUserProperties.h
+    ../Common/Common.h
+    ../Common/Common.cxx
+)
+ADD_EXECUTABLE(
+   ${PROJECT_NAME}
+   ${FBX_TARGET_SOURCE}
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE fbxsdk)
+fbx_target_finalize(${PROJECT_NAME})

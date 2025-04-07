@@ -1,0 +1,2 @@
+D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/MinSizeRel/Commands.obj
+D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/MinSizeRel/FbxHandle.obj
