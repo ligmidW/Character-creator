@@ -7,7 +7,7 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)](https://www.python.org/)
 [![Visual Studio 2022](https://img.shields.io/badge/Visual%20Studio-2022-purple.svg)](https://visualstudio.microsoft.com/)
 
-CharacterFactory 是一个 Maya 插件，用于处理角色相关的操作，主要功能包括：
+Character-creator 是一个 Maya 插件，用于处理角色相关的操作，主要功能包括：
 
 - cmake一键构建maya插件
 - 处理多个 FBX 文件并提取顶点数据,创建 BlendShape 节点,通过调整blendshape的权重通过融合的方式来实现制作新角色
