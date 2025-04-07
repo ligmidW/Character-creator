@@ -1,4 +1,4 @@
-# CharacterFactory Maya Plugin
+# CharacteCreator Maya Plugin
 
 """持续更新中"""
 
