@@ -1,3 +1,0 @@
-D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/RelWithDebInfo/Commands.obj
-D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/RelWithDebInfo/FbxHandle.obj
-D:/work/Maya/CharacterFactory/api/build/CharacterFactory.dir/RelWithDebInfo/AutoRigCreate.obj
