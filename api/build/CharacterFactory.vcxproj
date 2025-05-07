@@ -456,8 +456,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
     <ClCompile Include="D:\work\Maya\CharacterFactory\api\src\Commands.cpp" />
     <ClCompile Include="D:\work\Maya\CharacterFactory\api\src\FbxHandle.cpp" />
+    <ClCompile Include="D:\work\Maya\CharacterFactory\api\src\AutoRigCreate.cpp" />
     <ClInclude Include="D:\work\Maya\CharacterFactory\api\include\Commands.h" />
     <ClInclude Include="D:\work\Maya\CharacterFactory\api\include\FbxHandle.h" />
+    <ClInclude Include="D:\work\Maya\CharacterFactory\api\include\AutoRigCreate.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\work\Maya\CharacterFactory\api\build\ZERO_CHECK.vcxproj">

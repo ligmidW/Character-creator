@@ -26,11 +26,13 @@ add_definitions(
 set(SOURCE_FILES
     src/Commands.cpp
     src/FbxHandle.cpp
+    src/AutoRigCreate.cpp
 )
 
 set(HEADER_FILES
     include/Commands.h
     include/FbxHandle.h
+    include/AutoRigCreate.h
 )
 
 include_directories(${MAYA_INCLUDE_DIR})

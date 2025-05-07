@@ -7,12 +7,18 @@
     <ClCompile Include="D:\work\Maya\CharacterFactory\api\src\FbxHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\work\Maya\CharacterFactory\api\src\AutoRigCreate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\work\Maya\CharacterFactory\api\include\Commands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\work\Maya\CharacterFactory\api\include\FbxHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\work\Maya\CharacterFactory\api\include\AutoRigCreate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

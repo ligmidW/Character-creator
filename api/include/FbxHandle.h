@@ -27,9 +27,9 @@ private:
     
     void saveJsonFile(const vector<map<string, vector<array<double, 3>>>>& data, const string& filePath);
     
-    array<array<double,4>,4> computeRigidTransform(const vector<array<double,3>>& src_points, const vector<array<double,3>>& tgt_points);
+    array<array<double,4>,4> calculateRigidTransformation(const vector<array<double,3>>& src_points, const vector<array<double,3>>& tgt_points);
     
-    array<double,3> applyTransform(const array<double,3>& point, const array<array<double,4>,4>& transform);
+    array<double,3> applyTransformation(const array<double,3>& point, const array<array<double,4>,4>& transform);
     
     vector<map<string, vector<array<double, 3>>>> getMeshGap(const vector<map<string, vector<array<double, 3>>>>& meshData);
     

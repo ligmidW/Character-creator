@@ -1,5 +1,6 @@
 #include "Commands.h"
 #include "FbxHandle.h"
+#include "AutoRigCreate.h"
 #include <maya/MFnPlugin.h>
 #include <maya/MGlobal.h>
 #include <maya/MArgList.h>
@@ -17,6 +18,7 @@ public:
 };
 
 const char* characterfactoryfbxhandle::commandName = "characterfactoryfbxhandle";
+const char* characterfactoryautorigcreate::commandName = "characterfactoryautorigcreate";
 
 characterfactoryfbxhandle::characterfactoryfbxhandle() : pImpl(new Implementation()) {}
 characterfactoryfbxhandle::~characterfactoryfbxhandle() {
@@ -89,6 +91,15 @@ CHARACTER_FACTORY_EXPORT MStatus initializePlugin(MObject obj) {
         status.perror("Failed to register command: characterfactoryfbxhandle");
         return status;
     }
+    
+    // 注册AutoRigCreate命令
+    status = plugin.registerCommand(cf::characterfactoryautorigcreate::commandName,
+                                  cf::characterfactoryautorigcreate::creator);
+    if (!status) {
+        status.perror("Failed to register command: characterfactoryautorigcreate");
+        return status;
+    }
+    
     return status;
 }
 
@@ -101,5 +112,13 @@ CHARACTER_FACTORY_EXPORT MStatus uninitializePlugin(MObject obj) {
         status.perror("Failed to deregister command: characterfactoryfbxhandle");
         return status;
     }
+    
+    // 注销AutoRigCreate命令
+    status = plugin.deregisterCommand(cf::characterfactoryautorigcreate::commandName);
+    if (!status) {
+        status.perror("Failed to deregister command: characterfactoryautorigcreate");
+        return status;
+    }
+    
     return status;
 }

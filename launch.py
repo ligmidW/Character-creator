@@ -36,3 +36,4 @@ json_path = r"D:/work/Maya/CharacterFactory/resources/skin_weights.json"
 
 if __name__ == "__main__":
     characterfactoryfbxhandle(fbx_files, output_path, json_path)
+    cmds.characterfactoryautorigcreate()

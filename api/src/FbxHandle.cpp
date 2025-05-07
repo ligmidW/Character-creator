@@ -154,7 +154,7 @@ namespace cf {
         vector<array<array<double,4>,4>> transforms;
         for (size_t i = 1; i < correspondencePoints.size(); ++i) {
             MGlobal::displayInfo(MString("Computing transform for model ") + static_cast<double>(i));
-            transforms.push_back(computeRigidTransform(correspondencePoints[0], correspondencePoints[i]));
+            transforms.push_back(calculateRigidTransformation(correspondencePoints[0], correspondencePoints[i]));
         }
 
         for (size_t i = 0; i < transforms.size(); ++i) {
@@ -175,7 +175,7 @@ namespace cf {
             for (auto& [meshName, vertices] : fbxData[i]) {
                 vector<array<double,3>> newVertices;
                 for (const auto& vertex : vertices) {
-                    newVertices.push_back(applyTransform(vertex, transform));
+                    newVertices.push_back(applyTransformation(vertex, transform));
                 }
                 fbxData[i][meshName] = newVertices;
             }
@@ -350,7 +350,7 @@ namespace cf {
         return result;
     }
 
-    array<array<double,4>,4> FbxModelHandle::computeRigidTransform(const vector<array<double,3>>& src_points, const vector<array<double,3>>& tgt_points) {
+    array<array<double,4>,4> FbxModelHandle::calculateRigidTransformation(const vector<array<double,3>>& src_points, const vector<array<double,3>>& tgt_points) {
         MGlobal::displayInfo(MString("Computing transform with source points: ") + static_cast<double>(src_points.size()) + " target points: " + static_cast<double>(tgt_points.size()));
         
         if (src_points.size() != tgt_points.size() || src_points.empty()) {
@@ -426,7 +426,7 @@ namespace cf {
         return transform;
     }
 
-    array<double,3> FbxModelHandle::applyTransform(const array<double,3>& point, const array<array<double,4>,4>& transform) {
+    array<double,3> FbxModelHandle::applyTransformation(const array<double,3>& point, const array<array<double,4>,4>& transform) {
         array<double,3> result = {0.0, 0.0, 0.0};
         for (int i = 0; i < 3; ++i) {
             result[i] = transform[i][3];

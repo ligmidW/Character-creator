@@ -6,6 +6,7 @@ EXPORTS
 	??_R0?AV_Ref_count_base@std@@@8 	 DATA
 	??_R0?AVbad_alloc@std@@@8 	 DATA
 	??_R0?AVbad_array_new_length@std@@@8 	 DATA
+	??_R0?AVcharacterfactoryautorigcreate@cf@@@8 	 DATA
 	??_R0?AVcharacterfactoryfbxhandle@cf@@@8 	 DATA
 	??_R0?AVexception@detail@json_abi_v3_11_3@nlohmann@@@8 	 DATA
 	??_R0?AVexception@std@@@8 	 DATA
@@ -17,7 +18,10 @@ EXPORTS
 	??_R0?AVtype_error@detail@json_abi_v3_11_3@nlohmann@@@8 	 DATA
 	?MhInstPlugin@@3PEAUHINSTANCE__@@EA 	 DATA
 	?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA 	 DATA
+	?commandName@characterfactoryautorigcreate@cf@@2PEBDEB 	 DATA
 	?commandName@characterfactoryfbxhandle@cf@@2PEBDEB 	 DATA
+	?mGlobalFbxManager@characterfactoryautorigcreate@cf@@0PEAVFbxManager@fbxsdk@@EA 	 DATA
+	?mGlobalFbxScene@characterfactoryautorigcreate@cf@@0PEAVFbxScene@fbxsdk@@EA 	 DATA
 	ADSK_PLUGIN_SIGNATURE 	 DATA
 	MApiVersion 	 DATA
 	??$?0PEAD$0A@@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAA@PEAD0AEBV?$allocator@D@1@@Z
@@ -180,6 +184,8 @@ EXPORTS
 	??0bad_alloc@std@@QEAA@AEBV01@@Z
 	??0bad_array_new_length@std@@QEAA@AEBV01@@Z
 	??0bad_array_new_length@std@@QEAA@XZ
+	??0characterfactoryautorigcreate@cf@@QEAA@AEBV01@@Z
+	??0characterfactoryautorigcreate@cf@@QEAA@XZ
 	??0characterfactoryfbxhandle@cf@@QEAA@AEBV01@@Z
 	??0characterfactoryfbxhandle@cf@@QEAA@XZ
 	??0exception@detail@json_abi_v3_11_3@nlohmann@@QEAA@AEBV0123@@Z
@@ -266,6 +272,7 @@ EXPORTS
 	??1KeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@QEAA@XZ
 	??1_Ref_count_base@std@@UEAA@XZ
 	??1bad_array_new_length@std@@UEAA@XZ
+	??1characterfactoryautorigcreate@cf@@UEAA@XZ
 	??1characterfactoryfbxhandle@cf@@UEAA@XZ
 	??1data@?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@QEAA@XZ
 	??1exception@std@@UEAA@XZ
@@ -275,6 +282,7 @@ EXPORTS
 	??1parse_error@detail@json_abi_v3_11_3@nlohmann@@UEAA@XZ
 	??1type_error@detail@json_abi_v3_11_3@nlohmann@@UEAA@XZ
 	??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAAEAV01@$$QEAV01@@Z
+	??4characterfactoryautorigcreate@cf@@QEAAAEAV01@AEBV01@@Z
 	??4characterfactoryfbxhandle@cf@@QEAAAEAV01@AEBV01@@Z
 	??A?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@U?$less@X@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@std@@@2@@std@@QEAAAEAV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z
 	??A?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@U?$less@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@@std@@@2@@std@@QEAAAEAV?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z
@@ -287,6 +295,7 @@ EXPORTS
 	??_7?$output_string_adapter@DV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@detail@json_abi_v3_11_3@nlohmann@@6B@
 	??_7bad_alloc@std@@6B@
 	??_7bad_array_new_length@std@@6B@
+	??_7characterfactoryautorigcreate@cf@@6B@
 	??_7characterfactoryfbxhandle@cf@@6B@
 	??_7exception@detail@json_abi_v3_11_3@nlohmann@@6B@
 	??_7exception@std@@6B@
@@ -300,6 +309,9 @@ EXPORTS
 	?Clear@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@fbxsdk@@QEAAXXZ
 	?Clear@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEAAXXZ
 	?ClearSubTree@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@fbxsdk@@IEAAXPEAVRecordType@12@@Z
+	?CreateFbxScene@characterfactoryautorigcreate@cf@@QEAA_NPEBD@Z
+	?FbxExporter@Implementation@characterfactoryautorigcreate@cf@@QEAA?AVMString@OpenMaya20220000@Maya@Autodesk@@XZ
+	?FbxExporter@characterfactoryautorigcreate@cf@@QEAA?AVMString@OpenMaya20220000@Maya@Autodesk@@XZ
 	?Find@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEBAPEAVRecordType@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@2@AEBQEAVFbxObject@2@@Z
 	?Find@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEBAPEAVRecordType@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@2@AEBVFbxString@2@@Z
 	?FixNodesAfterInsertion@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@fbxsdk@@IEAAXPEAVRecordType@12@@Z
@@ -307,6 +319,7 @@ EXPORTS
 	?Get@?$FbxObjectMap@VFbxString@fbxsdk@@UFbxStringCompare@2@@fbxsdk@@QEAAPEAVFbxObject@2@PEAVRecordType@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@2@@Z
 	?GetCount@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEBAHXZ
 	?GetFirst@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEBAPEAVRecordType@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@2@XZ
+	?GetGlobalFbxScene@characterfactoryautorigcreate@cf@@SAPEAVFbxScene@fbxsdk@@XZ
 	?GetNext@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEBAPEAVRecordType@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@2@PEAV342@@Z
 	?Remove@?$FbxSimpleMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@@fbxsdk@@QEAAXPEAVRecordType@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@2@@Z
 	?RemoveNode@?$FbxRedBlackTree@VKeyValuePair@?$FbxMap@VFbxString@fbxsdk@@PEAVFbxObject@2@UFbxStringCompare@2@VFbxBaseAllocator@2@@fbxsdk@@UFbxStringCompare@3@VFbxBaseAllocator@3@@fbxsdk@@IEAAXPEAVRecordType@12@@Z
@@ -370,16 +383,17 @@ EXPORTS
 	?allocate@?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@QEAAPEAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_K@Z
 	?allocate@?$allocator@V?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@U?$less@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@@std@@@2@@std@@@std@@QEAAPEAV?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@U?$less@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@@std@@@2@@2@_K@Z
 	?append@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAAEAV12@QEBD_K@Z
-	?applyTransform@FbxModelHandle@cf@@AEAA?AV?$array@N$02@std@@AEBV34@AEBV?$array@V?$array@N$03@std@@$03@4@@Z
+	?applyTransformation@FbxModelHandle@cf@@AEAA?AV?$array@N$02@std@@AEBV34@AEBV?$array@V?$array@N$03@std@@$03@4@@Z
 	?back@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAAEBDXZ
 	?back@?$vector@PEAV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@V?$allocator@PEAV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@std@@@std@@QEAAAEAPEAV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@XZ
 	?back@?$vector@_NV?$allocator@_N@std@@@std@@QEAA?AV?$_Vb_reference@U?$_Wrap_alloc@V?$allocator@I@std@@@std@@@2@XZ
 	?begin@?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@QEBA?AV?$iter_impl@$$CBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@23@XZ
 	?begin@?$iteration_proxy@V?$iter_impl@$$CBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@QEBA?AV?$iteration_proxy_value@V?$iter_impl@$$CBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@@234@XZ
 	?calculateRegionCenter@FbxModelHandle@cf@@AEAA?AV?$array@N$02@std@@AEBV?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@4@@Z
-	?computeRigidTransform@FbxModelHandle@cf@@AEAA?AV?$array@V?$array@N$03@std@@$03@std@@AEBV?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@4@0@Z
+	?calculateRigidTransformation@FbxModelHandle@cf@@AEAA?AV?$array@V?$array@N$03@std@@$03@std@@AEBV?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@4@0@Z
 	?createBlendShapes@FbxModelHandle@cf@@AEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@AEBV?$vector@V?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@U?$less@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@@std@@@2@@std@@V?$allocator@V?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@U?$less@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@@std@@@2@@std@@@2@@4@AEAV?$map@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@U?$less@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@@std@@@2@@4@@Z
 	?createFbxScene@FbxModelHandle@cf@@AEAA_NPEBD@Z
+	?creator@characterfactoryautorigcreate@cf@@SAPEAXXZ
 	?creator@characterfactoryfbxhandle@cf@@SAPEAXXZ
 	?deallocate@?$allocator@D@std@@QEAAXQEAD_K@Z
 	?deallocate@?$allocator@H@std@@QEAAXQEAH_K@Z
@@ -394,6 +408,7 @@ EXPORTS
 	?deallocate@?$allocator@V?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@std@@@std@@QEAAXQEAV?$vector@V?$array@N$02@std@@V?$allocator@V?$array@N$02@std@@@2@@2@_K@Z
 	?deallocate@?$allocator@_K@std@@QEAAXQEA_K_K@Z
 	?destroy@json_value@?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@QEAAXW4value_t@detail@34@@Z
+	?doIt@characterfactoryautorigcreate@cf@@UEAA?AVMStatus@OpenMaya20220000@Maya@Autodesk@@AEBVMArgList@456@@Z
 	?doIt@characterfactoryfbxhandle@cf@@UEAA?AVMStatus@OpenMaya20220000@Maya@Autodesk@@AEBVMArgList@456@@Z
 	?dump@?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HD_NW4error_handler_t@detail@23@@Z
 	?dump@?$serializer@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@QEAAXAEBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@34@_N1II@Z
@@ -417,6 +432,7 @@ EXPORTS
 	?grisu2_digit_gen@dtoa_impl@detail@json_abi_v3_11_3@nlohmann@@YAXPEADAEAH1Udiyfp@1234@22@Z
 	?hex_bytes@?$serializer@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@CA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@E@Z
 	?initializePlugin@@YA?AVMStatus@OpenMaya20220000@Maya@Autodesk@@VMObject@234@@Z
+	?isUndoable@characterfactoryautorigcreate@cf@@UEBA_NXZ
 	?isUndoable@characterfactoryfbxhandle@cf@@UEBA_NXZ
 	?key@?$iter_impl@$$CBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
 	?key@?$iteration_proxy_value@V?$iter_impl@$$CBV?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ

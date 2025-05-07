@@ -1,16 +1,17 @@
 # CharacterFactory Maya Plugin
 
 """持续更新中"""
+ssh -v midlig@192.168.31.58 "python D:\\work\\Maya\\CharacterFactory\\setup.py"
 
 [![Maya 2022](https://img.shields.io/badge/Maya-2022-blue.svg)](https://www.autodesk.com/products/maya/overview)
 [![FBX SDK 2020.3.7](https://img.shields.io/badge/FBX%20SDK-2020.3.7-orange.svg)](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-3)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)](https://www.python.org/)
 [![Visual Studio 2022](https://img.shields.io/badge/Visual%20Studio-2022-purple.svg)](https://visualstudio.microsoft.com/)
 
-CharacterFactory 是一个 Maya 插件，用于处理角色相关的操作，主要功能包括：
+Character-creator 是一个 Maya 插件，用于处理角色相关的操作，主要功能包括：
 
 - cmake一键构建maya插件
-- 处理多个 FBX 文件并提取顶点数据,创建 BlendShape 节点,通过调整blendshape的权重通过融合的方式来实现制作新角色
+- 处理多个 FBX 文件并提取顶点数据,创建 BlendShape 节点
 - 计算不同 FBX 文件之间的网格差异
 - 读取权重 JSON 文件进行调整
 
@@ -98,47 +99,16 @@ nlohmann-json==3.11.2  # 用于JSON处理
 在Maya的脚本编辑器中执行以下Python代码：
 
 ```python
-# 加载插件
-import maya.cmds as cmds
-import maya.OpenMaya as om
-
-# 确保插件已加载
-if not cmds.pluginInfo("CharacterFactory.mll", query=True, loaded=True):
-    cmds.loadPlugin("CharacterFactory.mll")
-
-# 使用插件功能处理多个FBX文件
 fbx_files = [
-    r"path/to/first.fbx",
-    r"path/to/second.fbx",
-    r"path/to/third.fbx"
+    r"D:/work/Maya/CharacterFactory/resources/trump.fbx",
+    r"D:/work/Maya/CharacterFactory/resources/bge.fbx",
+    r"D:/work/Maya/CharacterFactory/resources/cooper.fbx",
+    r"D:/work/Maya/CharacterFactory/resources/farrukh.fbx"
 ]
-fbx_files_str = ";".join(fbx_files)  # 使用分号连接多个文件路径
-output_path = r"path/to/output.fbx"  # 输出FBX文件路径
-json_path = r"path/to/weights.json"  # 权重JSON文件路径
+output_path = r"D:/work/Maya/CharacterFactory/resources/head_blend.fbx"
+json_path = r"D:/work/Maya/CharacterFactory/resources/skin_weights.json"
 
-# 调用插件命令
-cmds.characterfactoryfbxhandle(fbx_files_str, output_path, json_path)
+if __name__ == "__main__":
+    characterfactoryfbxhandle(fbx_files, output_path, json_path)
 ```
 
-### 使用提供的Python脚本
-
-项目提供了 `launch.py` 脚本，可以更简单地调用插件功能：
-
-```python
-# 导入脚本
-import sys
-sys.path.append(r"path/to/CharacterFactory")  # 添加项目路径
-import launch
-
-# 设置文件路径
-fbx_files = [
-    r"path/to/first.fbx",
-    r"path/to/second.fbx",
-    r"path/to/third.fbx"
-]
-output_path = r"path/to/output.fbx"
-json_path = r"path/to/weights.json"
-
-# 调用函数
-launch.characterfactoryfbxhandle(fbx_files, output_path, json_path)
-```
