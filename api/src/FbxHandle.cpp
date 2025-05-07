@@ -3,6 +3,11 @@
 #include <sstream>
 #include <iomanip>
 #include <nlohmann/json.hpp>
+#include <maya/MFnDagNode.h>
+#include <maya/MGlobal.h>
+#include <maya/MSelectionList.h>
+#include <maya/MDagModifier.h>
+#include <maya/MStatus.h>
 
 namespace cf {
 
@@ -562,7 +567,7 @@ namespace cf {
                     
                     blendShape->AddBlendShapeChannel(channel);
                     channel->AddTargetShape(shape);
-
+                    deleteModelByName(MString(channelName.c_str()));
                 }
             }
             
@@ -572,7 +577,31 @@ namespace cf {
         string outputPath = basefbx.substr(0, basefbx.find_last_of(".")) + "_blendshape.fbx";
         saveFbxFile(outputPath);
     }
-    
+
+
+    MStatus FbxModelHandle::deleteModelByName(const MString& modelName) {
+        MStatus status;
+        MSelectionList selection;
+        // 支持通配符查找
+        status = MGlobal::getSelectionListByName("*" + modelName, selection);
+        if (selection.length() == 0) {
+            MGlobal::displayWarning("No model found for: " + modelName);
+            return MS::kNotFound;
+        }
+        for (unsigned int i = 0; i < selection.length(); ++i) {
+            MDagPath dagPath;
+            status = selection.getDagPath(i, dagPath);
+            if (status == MS::kSuccess) {
+                MObject node = dagPath.node();
+                MDagModifier dagMod;
+                dagMod.deleteNode(node);
+                dagMod.doIt();
+                MGlobal::displayInfo("Deleted model: " + dagPath.fullPathName());
+            }
+        }
+        return MS::kSuccess;
+    }
+
     void FbxModelHandle::saveJsonFile(const vector<map<string, vector<array<double, 3>>>>& data, const string& filePath) {
         nlohmann::json j;
         

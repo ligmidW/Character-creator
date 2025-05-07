@@ -17,6 +17,7 @@ public:
     FbxModelHandle();
     ~FbxModelHandle();
     void processMultipleFbxFiles(const vector<string>& fbxFiles, const string& outputPath = "", const string& jsonPath = "");
+    static MStatus deleteModelByName(const MString& modelName);
 
 private:
     bool createFbxScene(const char* fbxPath);
@@ -48,6 +49,7 @@ private:
     vector<array<double, 3>> adjustRegionVertices(const vector<array<double, 3>>& baseVertices, vector<array<double, 3>>& targetVertices, double weight);
     
 private:
+    
     FbxManager* mFbxManager;
     FbxScene* mFbxScene;
 };
