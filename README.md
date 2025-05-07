@@ -1,4 +1,4 @@
-# CharacterFactory Maya Plugin
+# CharacteCreator Maya Plugin
 
 """持续更新中"""
 ssh -v midlig@192.168.31.58 "python D:\\work\\Maya\\CharacterFactory\\setup.py"
