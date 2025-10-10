@@ -3,9 +3,8 @@ import psutil
 import time
 import subprocess
 from scripts.config.settings import (
-    MAYA_BIN, MAYA_VERSION, PLUGIN_NAME, 
-    MAYA_APP_DIR, MAYA_SCRIPT_PATH, MAYA_PLUGIN_PATH,
-    DESKTOP_PATH, MAYA_USER, MAYA_TASK_NAME
+    MAYA_BIN, MAYA_APP_DIR, MAYA_SCRIPT_PATH, MAYA_PLUGIN_PATH,
+    DESKTOP_PATH
 )
 from scripts.maya.plugins import copy_plugin_to_maya
 
@@ -87,32 +86,20 @@ def launch_maya():
         
         # Make sure the batch file is executable
         os.chmod(batch_file_path, 0o755)
-        
-        # Create a scheduled task to run the batch file immediately
-        print(f"Creating scheduled task to launch Maya: {MAYA_TASK_NAME}")
-        
-        # Delete any existing task with the same name
-        subprocess.run(f'schtasks /delete /tn "{MAYA_TASK_NAME}" /f', 
-                      shell=True, 
-                      stdout=subprocess.DEVNULL, 
-                      stderr=subprocess.DEVNULL)
-        
-        # Create and run the task immediately
-        create_task_cmd = f'schtasks /create /tn "{MAYA_TASK_NAME}" /tr "{batch_file_path}" /sc once /st 00:00 /ru "{MAYA_USER}" /f'
-        run_task_cmd = f'schtasks /run /tn "{MAYA_TASK_NAME}"'
-        
-        print("Creating scheduled task...")
-        create_result = subprocess.run(create_task_cmd, 
-                                     shell=True, 
-                                     capture_output=True, 
-                                     text=True, 
-                                     encoding='gbk')
-        
-        if create_result.returncode != 0:
-            print(f"Failed to create scheduled task: {create_result.stderr}")
-            
-            # Alternative method: try creating a desktop shortcut
-            print("Trying alternative method: creating desktop shortcut...")
+
+        # Direct execution method - launch Maya immediately
+        print("Launching Maya directly...")
+        try:
+            subprocess.Popen(f'cmd.exe /c "{batch_file_path}"',
+                           shell=True,
+                           creationflags=subprocess.CREATE_NEW_CONSOLE)
+            print("Maya launch initiated successfully")
+            print("Maya should start shortly on the Windows system")
+        except Exception as e:
+            print(f"Direct execution failed: {e}")
+
+            # Fallback: create desktop shortcut
+            print("Creating desktop shortcut as fallback...")
             shortcut_path = os.path.join(DESKTOP_PATH, "StartMaya.bat")
             with open(shortcut_path, 'w', encoding='gbk') as f:
                 f.write('@echo off\n')
@@ -120,26 +107,10 @@ def launch_maya():
                 f.write(f'set MAYA_SCRIPT_PATH={MAYA_SCRIPT_PATH}\n')
                 f.write(f'set MAYA_PLUG_IN_PATH={MAYA_PLUGIN_PATH}\n')
                 f.write(f'start "" "{MAYA_BIN}"\n')
-            
+
             print(f"Created desktop shortcut: {shortcut_path}")
             print("Please run this shortcut manually on the Windows desktop")
             return False
-        
-        print("Running scheduled task...")
-        run_result = subprocess.run(run_task_cmd, 
-                                  shell=True, 
-                                  capture_output=True, 
-                                  text=True, 
-                                  encoding='gbk')
-        
-        if run_result.returncode != 0:
-            print(f"Failed to run scheduled task: {run_result.stderr}")
-            print("Please check Windows Task Scheduler or run the batch file manually")
-            return False
-        
-        print("Maya launch task scheduled successfully")
-        print("Maya should start shortly on the Windows system")
-        print("If Maya does not start, please find the batch file on Windows desktop or check Task Scheduler")
         
         print(f"""
 Example code:

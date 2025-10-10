@@ -4,10 +4,14 @@
 #include <iomanip>
 #include <nlohmann/json.hpp>
 #include <maya/MFnDagNode.h>
-#include <maya/MGlobal.h>
+
 #include <maya/MSelectionList.h>
 #include <maya/MDagModifier.h>
 #include <maya/MStatus.h>
+#include <maya/MDagPath.h>
+#include <maya/MString.h>
+#include <maya/MObject.h>
+
 
 namespace cf {
 
@@ -118,13 +122,12 @@ namespace cf {
             MGlobal::displayError("Need at least two FBX files to process");
             return;
         }
-        
+
         vector<map<string, vector<array<double,3>>>> fbxData;
-        
+
         for (size_t i = 0; i < fbxFiles.size(); ++i) {
             string fbxPath = fbxFiles[i];
-            MGlobal::displayInfo(MString("Processing FBX file: ") + fbxPath.c_str());
-            
+
             if (createFbxScene(fbxPath.c_str())) {
                 auto meshData = getModelVertices();
                 if (!meshData.empty()) {
@@ -139,7 +142,7 @@ namespace cf {
                 allHeadData.push_back(it->second);
             }
         }
-    
+
         vector<int> correspondenceIndices;
         srand(static_cast<unsigned int>(time(nullptr)));
         for (int i = 0; i < 100; i++) {
@@ -158,22 +161,11 @@ namespace cf {
 
         vector<array<array<double,4>,4>> transforms;
         for (size_t i = 1; i < correspondencePoints.size(); ++i) {
-            MGlobal::displayInfo(MString("Computing transform for model ") + static_cast<double>(i));
+            // computing rigid transform
             transforms.push_back(calculateRigidTransformation(correspondencePoints[0], correspondencePoints[i]));
         }
 
-        for (size_t i = 0; i < transforms.size(); ++i) {
-            MString msg;
-            msg += MString("Transform----------------------------- ") + (i+1) + ":\n";
-            for (const auto& row : transforms[i]) {
-                for (double val : row) {
-                    msg += val;
-                    msg += " ";
-                }
-                msg += "\n";
-            }
-            MGlobal::displayInfo(msg);
-        }
+        // suppressed verbose transform dump
 
         for (size_t i = 1; i < fbxData.size(); ++i) {
             const auto& transform = transforms[i-1];
@@ -187,18 +179,19 @@ namespace cf {
         }
 
         nlohmann::json weightJson = readWeightJson(jsonPath);
-        
+
         vector<map<string, vector<array<double,3>>>> alignedData = fbxData;
         vector<map<string, vector<array<double,3>>>> meshGap;
         map<string, vector<array<double,3>>> vertexData;
+        map<string, map<string, array<double, 3>>> alignmentOffsets; // 存储对齐插值数据
 
         if (!weightJson.empty()) {
-            MGlobal::displayInfo("Aligning facial features based on region centers...");
-            alignedData = alignRegionsByCenter(fbxData, weightJson);
+            // aligning facial features
+            alignedData = alignRegionsByCenter(fbxData, weightJson, alignmentOffsets);
         }
-        
+
         meshGap = getMeshGap(alignedData);
-        
+
         for (const auto& [regionName, vertices] : alignedData[0]) {
             vector<array<double,3>> regionVertices;
             for (const auto& vertex : vertices) {
@@ -207,35 +200,41 @@ namespace cf {
             }
             vertexData[regionName] = regionVertices;
         }
-        
-        createBlendShapes(fbxFiles[0], weightJson, meshGap, vertexData);
+
+        createBlendShapes(fbxFiles[0], weightJson, meshGap, vertexData, alignmentOffsets);
     }
-    
-    vector<map<string, vector<array<double, 3>>>> FbxModelHandle::alignRegionsByCenter(const vector<map<string, vector<array<double, 3>>>>& fbxData, const nlohmann::json& weightJson) {
+
+    vector<map<string, vector<array<double, 3>>>> FbxModelHandle::alignRegionsByCenter(const vector<map<string, vector<array<double, 3>>>>& fbxData, const nlohmann::json& weightJson, map<string, map<string, array<double, 3>>>& alignmentOffsets) {
         if (fbxData.size() < 3) {
             MGlobal::displayWarning("Need at least two meshes to perform region alignment");
             return fbxData;
         }
-        
+
         vector<map<string, vector<array<double, 3>>>> result = fbxData;
         const auto& baseMesh = result[0];
-        
-        MGlobal::displayInfo("Performing region-based alignment");
-        
+
+        // performing region-based alignment
+
         for (size_t i = 1; i < result.size(); ++i) {
             auto& targetMesh = result[i];
-            result[i] = adjustVerticesByRegion(baseMesh, targetMesh, weightJson);
+            map<string, array<double, 3>> modelOffsets;
+            result[i] = adjustVerticesByRegion(baseMesh, targetMesh, weightJson, modelOffsets);
+
+            // 存储每个模型的对齐偏移数据
+            string modelKey = "model_" + std::to_string(i);
+            alignmentOffsets[modelKey] = modelOffsets;
         }
-        
-        MGlobal::displayInfo("Region alignment completed");
+
+        // region alignment completed
         return result;
     }
-    
+
     map<string, vector<array<double, 3>>> FbxModelHandle::adjustVerticesByRegion(
-        const map<string, vector<array<double, 3>>>& baseMesh, 
-        map<string, vector<array<double, 3>>>& targetMesh, 
-        const nlohmann::json& regionWeights) {
-        
+        const map<string, vector<array<double, 3>>>& baseMesh,
+        map<string, vector<array<double, 3>>>& targetMesh,
+        const nlohmann::json& regionWeights,
+        map<string, array<double, 3>>& regionOffsets) {
+
         map<string, vector<array<double, 3>>> result = targetMesh;
         map<string, vector<string>> regionToModelMap = {
             {"eyes_blendshape", {"saliva_lod0_mesh", "eyeRight_lod0_mesh", "eyeLeft_lod0_mesh", "eyeshell_lod0_mesh", "eyelashes_lod0_mesh", "eyeEdge_lod0_mesh", "cartilage_lod0_mesh"}},
@@ -246,11 +245,11 @@ namespace cf {
             if (regionName != "head_lod0_mesh") {
                 continue;
             }
-            
+
             if (baseMesh.find(regionName) == baseMesh.end() || targetMesh.find(regionName) == targetMesh.end()) {
                 continue;
             }
-            
+
             const auto& baseVertices = baseMesh.at(regionName);
             auto& targetVertices = targetMesh.at(regionName);
             for (auto& [subRegionName, indices] : regions.items()) {
@@ -258,7 +257,7 @@ namespace cf {
                 vector<array<double, 3>> targetRegionVertices;
                 vector<size_t> vertexIndices;
                 vector<double> weights;
-                
+
                 for (auto& [indexStr, weight] : indices.items()) {
                     size_t index = std::stoul(indexStr);
                     if (index < baseVertices.size() && index < targetVertices.size()) {
@@ -268,14 +267,14 @@ namespace cf {
                         weights.push_back(weight);
                     }
                 }
-                
+
                 if (baseRegionVertices.empty() || targetRegionVertices.empty()) {
                     continue;
                 }
-                
+
                 array<double, 3> baseCenter = calculateRegionCenter(baseRegionVertices);
                 array<double, 3> targetCenter = calculateRegionCenter(targetRegionVertices);
-                
+
                 array<double, 3> offset = {
                     targetCenter[0] - baseCenter[0],
                     targetCenter[1] - baseCenter[1],
@@ -283,11 +282,12 @@ namespace cf {
                 };
 
                 offsetMap[subRegionName] = offset;
+                regionOffsets[subRegionName] = offset; // 记录区域偏移用于BlendShape
 
                 for (size_t i = 0; i < vertexIndices.size(); ++i) {
                     size_t index = vertexIndices[i];
                     double weight = weights[i];
-                    
+
                     for (int j = 0; j < 3; ++j) {
                         result[regionName][index][j] -= offset[j] * weight;
                     }
@@ -303,61 +303,61 @@ namespace cf {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     array<double, 3> FbxModelHandle::calculateRegionCenter(const vector<array<double, 3>>& vertices) {
         array<double, 3> center = {0.0, 0.0, 0.0};
-        
+
         if (vertices.empty()) {
             return center;
         }
-        
+
         for (const auto& vertex : vertices) {
             for (int i = 0; i < 3; ++i) {
                 center[i] += vertex[i];
             }
         }
-        
+
         for (int i = 0; i < 3; ++i) {
             center[i] /= static_cast<double>(vertices.size());
         }
-        
+
         return center;
     }
-    
+
     vector<array<double, 3>> FbxModelHandle::adjustRegionVertices(
-        const vector<array<double, 3>>& baseVertices, 
-        vector<array<double, 3>>& targetVertices, 
+        const vector<array<double, 3>>& baseVertices,
+        vector<array<double, 3>>& targetVertices,
         double weight) {
-        
+
         if (baseVertices.size() != targetVertices.size() || baseVertices.empty()) {
             return targetVertices;
         }
-        
+
         array<double, 3> baseCenter = calculateRegionCenter(baseVertices);
         array<double, 3> targetCenter = calculateRegionCenter(targetVertices);
-        
+
         array<double, 3> offset = {
             targetCenter[0] - baseCenter[0],
             targetCenter[1] - baseCenter[1],
             targetCenter[2] - baseCenter[2]
         };
-        
+
         vector<array<double, 3>> result = targetVertices;
         for (size_t i = 0; i < result.size(); ++i) {
             for (int j = 0; j < 3; ++j) {
                 result[i][j] -= offset[j] * weight;
             }
         }
-        
+
         return result;
     }
 
     array<array<double,4>,4> FbxModelHandle::calculateRigidTransformation(const vector<array<double,3>>& src_points, const vector<array<double,3>>& tgt_points) {
-        MGlobal::displayInfo(MString("Computing transform with source points: ") + static_cast<double>(src_points.size()) + " target points: " + static_cast<double>(tgt_points.size()));
-        
+        // computing transform for point sets
+
         if (src_points.size() != tgt_points.size() || src_points.empty()) {
             MGlobal::displayWarning("Invalid points for transform computation");
             return array<array<double,4>,4>{{{0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}}};
@@ -447,37 +447,37 @@ namespace cf {
             MGlobal::displayWarning("Need at least two meshes to calculate gap");
             return {};
         }
-        
+
         vector<map<string, vector<array<double, 3>>>> result;
         result.reserve(meshData.size() - 1);
-        
+
         const auto& baseMesh = meshData[0];
-        
+
         map<string, size_t> vertexCounts;
         for (const auto& [regionName, vertices] : baseMesh) {
             vertexCounts[regionName] = vertices.size();
         }
-        
+
         for (size_t i = 1; i < meshData.size(); ++i) {
             const auto& currentMesh = meshData[i];
             map<string, vector<array<double, 3>>> regionGap;
-            
+
             for (const auto& [regionName, baseVertices] : baseMesh) {
                 auto currentIt = currentMesh.find(regionName);
                 if (currentIt == currentMesh.end()) {
                     continue;
                 }
-                
+
                 const auto& currentVertices = currentIt->second;
                 const size_t expectedSize = vertexCounts[regionName];
-                
+
                 if (currentVertices.size() != expectedSize) {
                     continue;
                 }
-                
+
                 vector<array<double, 3>> meshGap;
                 meshGap.reserve(expectedSize);
-                
+
                 for (size_t j = 0; j < expectedSize; ++j) {
                     const auto& baseVert = baseVertices[j];
                     const auto& currentVert = currentVertices[j];
@@ -485,22 +485,22 @@ namespace cf {
                                                            baseVert[1] - currentVert[1],
                                                            baseVert[2] - currentVert[2]});
                 }
-                
+
                 regionGap[regionName] = std::move(meshGap);
             }
-            
+
             result.push_back(std::move(regionGap));
         }
-        
+
         return result;
     }
 
-    void FbxModelHandle::createBlendShapes(const string& basefbx, const nlohmann::json& weightJson, const vector<map<string, vector<array<double,3>>>>& distance, map<string, vector<array<double,3>>>& vertexData) {
-        if (!createFbxScene(basefbx.c_str())) { 
+    void FbxModelHandle::createBlendShapes(const string& basefbx, const nlohmann::json& weightJson, const vector<map<string, vector<array<double,3>>>>& distance, map<string, vector<array<double,3>>>& vertexData, const map<string, map<string, array<double, 3>>>& alignmentOffsets) {
+        if (!createFbxScene(basefbx.c_str())) {
             MGlobal::displayError(MString("Failed to create FBX scene from base file: ") + basefbx.c_str());
             return;
         }
-        
+
         map<string, map<string, map<string, double>>> jsonData;
         for (auto meshIt = weightJson.begin(); meshIt != weightJson.end(); ++meshIt) {
             for (auto blendIt = meshIt.value().begin(); blendIt != meshIt.value().end(); ++blendIt) {
@@ -509,141 +509,89 @@ namespace cf {
                 }
             }
         }
-        
+
         for (const auto& [meshName, blendShapes] : jsonData) {
             FbxNode* rootNode = mFbxScene->GetRootNode();
             FbxNode* meshNode = findNodeByName(rootNode, meshName);
-            
+
             if (!meshNode) {
                 MGlobal::displayWarning(MString("Mesh not found in scene: ") + meshName.c_str());
                 continue;
             }
-            
+
             FbxMesh* mesh = meshNode->GetMesh();
             if (!mesh) {
                 MGlobal::displayWarning(MString("Node is not a mesh: ") + meshName.c_str());
                 continue;
             }
-            string meshName = meshNode->GetName();
+            string meshNameStr = meshNode->GetName();
 
             FbxBlendShape* blendShape = FbxBlendShape::Create(mFbxScene, (meshName + "_blendshape").c_str());
-            
-            for (const auto& [regionName, weights] : blendShapes) {
-                vector<string> suffixes = {"source_L", "source_M", "source_R"};
-                
-                for (int suffixIndex = 0; suffixIndex < suffixes.size(); ++suffixIndex) {
-                    string channelName = meshName + regionName + "_" + suffixes[suffixIndex];
-                    
-                    FbxBlendShapeChannel* channel = FbxBlendShapeChannel::Create(mFbxScene, channelName.c_str());
-                    
-                    FbxShape* shape = FbxShape::Create(mFbxScene, channelName.c_str());
-                    
-                    shape->InitControlPoints(mesh->GetControlPointsCount());
-                    FbxVector4* shapePoints = shape->GetControlPoints();
-                    FbxVector4* meshPoints = mesh->GetControlPoints();
-                    
-                    for (int i = 0; i < mesh->GetControlPointsCount(); i++) {
-                        string vertexIndex = std::to_string(i);
-                        auto weightIt = weights.find(vertexIndex);
-                        if (weightIt != weights.end() && weightIt->second != 0) {
-                            if (suffixIndex < distance.size()) {
-                                auto& meshDistances = distance[suffixIndex];
-                                auto meshIt = meshDistances.find(meshName);
-                                if (meshIt != meshDistances.end() && i < meshIt->second.size()) {
-                                    double x = meshPoints[i][0] - meshIt->second[i][0] * weightIt->second;
-                                    double y = meshPoints[i][1] - meshIt->second[i][1] * weightIt->second;
-                                    double z = meshPoints[i][2] - meshIt->second[i][2] * weightIt->second;
-                                    shapePoints[i].Set(x, y, z);
-                                } else {
-                                    shapePoints[i] = meshPoints[i];
-                                }
-                            } else {
-                                shapePoints[i] = meshPoints[i];
-                            }
-                        } else {
-                            shapePoints[i] = meshPoints[i];
-                        }
-                    }
-                    
-                    blendShape->AddBlendShapeChannel(channel);
-                    channel->AddTargetShape(shape);
-                    deleteModelByName(MString(channelName.c_str()));
-                }
+            // 注意：FBX SDK 2020.3.7中BlendShape默认就是平行/加法模式
+
+            addSourceBlendShapes(mesh, meshNameStr, blendShapes, distance, blendShape);
+
+            // Append alignment interpolation BlendShapes to the same deformer if provided
+            if (!alignmentOffsets.empty()) {
+                addAlignmentBlendShapes(mesh, meshNameStr, weightJson, alignmentOffsets, blendShape);
             }
-            
+
             mesh->AddDeformer(blendShape);
         }
 
         string outputPath = basefbx.substr(0, basefbx.find_last_of(".")) + "_blendshape.fbx";
         saveFbxFile(outputPath);
+
+        // After creating all blendshape channels and exporting, cleanup duplicated DAG models collected
+        cleanupMarkedNodes();
     }
 
-
-    MStatus FbxModelHandle::deleteModelByName(const MString& modelName) {
-        MStatus status;
-        MSelectionList selection;
-        // 支持通配符查找
-        status = MGlobal::getSelectionListByName("*" + modelName, selection);
-        if (selection.length() == 0) {
-            MGlobal::displayWarning("No model found for: " + modelName);
-            return MS::kNotFound;
+    void FbxModelHandle::markNodeForCleanup(const MString& nodeName) {
+        for (const auto& n : m_nodesToCleanup) {
+            if (n == nodeName) return; // avoid duplicates
         }
-        for (unsigned int i = 0; i < selection.length(); ++i) {
-            MDagPath dagPath;
-            status = selection.getDagPath(i, dagPath);
-            if (status == MS::kSuccess) {
-                MObject node = dagPath.node();
-                MDagModifier dagMod;
-                dagMod.deleteNode(node);
-                dagMod.doIt();
-                MGlobal::displayInfo("Deleted model: " + dagPath.fullPathName());
-            }
-        }
-        return MS::kSuccess;
+        m_nodesToCleanup.push_back(nodeName);
     }
 
-    void FbxModelHandle::saveJsonFile(const vector<map<string, vector<array<double, 3>>>>& data, const string& filePath) {
-        nlohmann::json j;
-        
-        for (size_t i = 0; i < data.size(); ++i) {
-            const auto& meshes = data[i];
-            nlohmann::json meshJson;
-            
-            for (const auto& [meshName, vertices] : meshes) {
-                meshJson[meshName] = vertices;
+    void FbxModelHandle::cleanupMarkedNodes() {
+        if (m_nodesToCleanup.empty()) return;
+
+        auto deleteByPattern = [&](const MString& pattern){
+            MSelectionList selection;
+            if (MGlobal::getSelectionListByName(pattern, selection) != MS::kSuccess) return;
+            for (unsigned int i = 0; i < selection.length(); ++i) {
+                MDagPath dagPath; MObject comp;
+                if (selection.getDagPath(i, dagPath, comp) != MS::kSuccess) continue;
+                if (!dagPath.isValid()) continue;
+                if (dagPath.hasFn(MFn::kMesh) || dagPath.hasFn(MFn::kTransform)) {
+                    MDagModifier dagMod; dagMod.deleteNode(dagPath.node()); dagMod.doIt();
+                }
             }
-            
-            j.push_back(meshJson);
+        };
+
+        for (const auto& name : m_nodesToCleanup) {
+            // exact and namespaced matches
+            deleteByPattern(name);
+            deleteByPattern(MString("*:") + name);
         }
-        
-        try {
-            FILE* fp = fopen(filePath.c_str(), "w");
-            if (fp) {
-                string jsonStr = j.dump(4);
-                fwrite(jsonStr.c_str(), 1, jsonStr.size(), fp);
-                fclose(fp);
-            } else {
-                MGlobal::displayError(MString("Failed to open file for writing: ") + filePath.c_str());
-            }
-        } catch (const exception& e) {
-            MGlobal::displayError(MString("Error saving JSON file: ") + e.what());
-        }
+        m_nodesToCleanup.clear();
+
     }
 
     nlohmann::json FbxModelHandle::readWeightJson(const string& weightJsonPath) {
         nlohmann::json weightJson;
-        
+
         try {
             FILE* fp = fopen(weightJsonPath.c_str(), "r");
             if (fp) {
                 fseek(fp, 0, SEEK_END);
                 long fileSize = ftell(fp);
                 fseek(fp, 0, SEEK_SET);
-                
+
                 string jsonContent(fileSize, ' ');
                 fread(&jsonContent[0], 1, fileSize, fp);
                 fclose(fp);
-                
+
                 weightJson = nlohmann::json::parse(jsonContent);
             } else {
                 MGlobal::displayError(MString("Failed to open weight JSON file: ") + weightJsonPath.c_str());
@@ -651,7 +599,7 @@ namespace cf {
         } catch (const exception& e) {
             MGlobal::displayError(MString("Error parsing weight JSON: ") + e.what());
         }
-        
+
         return weightJson;
     }
 
@@ -659,6 +607,7 @@ namespace cf {
         if (!node) return nullptr;
 
         if (node->GetName() == name) return node;
+
 
         for (int i = 0; i < node->GetChildCount(); ++i) {
             FbxNode* child = node->GetChild(i);
@@ -668,42 +617,42 @@ namespace cf {
 
         return nullptr;
     }
-    
+
     bool FbxModelHandle::saveFbxFile(const string& outputPath) {
         if (!mFbxScene || !mFbxManager) {
             MGlobal::displayError("FBX Scene or Manager is not initialized");
             return false;
         }
-        
+
         string dirPath = outputPath;
         size_t lastSlash = dirPath.find_last_of("/\\");
         if (lastSlash != string::npos) {
             dirPath = dirPath.substr(0, lastSlash);
-            
+
             MString checkDirCmd = "file -q -exists \"" + MString(dirPath.c_str()) + "\"";
             int dirExists = 0;
             MGlobal::executeCommand(checkDirCmd, dirExists);
-            
+
             if (!dirExists) {
                 MString createDirCmd = "sysFile -makeDir \"" + MString(dirPath.c_str()) + "\"";
                 int result = 0;
                 MGlobal::executeCommand(createDirCmd, result);
-                
+
                 if (!result) {
                     MGlobal::displayError(MString("Failed to create directory: ") + dirPath.c_str());
                     return false;
                 }
-                
-                MGlobal::displayInfo(MString("Created directory: ") + dirPath.c_str());
+
+                // created directory:
             }
         }
-        
+
         FbxExporter* exporter = FbxExporter::Create(mFbxManager, "");
         if (!exporter) {
             MGlobal::displayError("Failed to create FBX exporter");
             return false;
         }
-        
+
         int fileFormat = mFbxManager->GetIOPluginRegistry()->FindWriterIDByDescription("FBX ascii (*.fbx)");
         bool initResult = exporter->Initialize(outputPath.c_str(), fileFormat, mFbxManager->GetIOSettings());
         if (!initResult) {
@@ -711,28 +660,127 @@ namespace cf {
             errorMsg += exporter->GetStatus().GetErrorString();
             MGlobal::displayError(errorMsg);
             exporter->Destroy();
+
             return false;
         }
-        
+
+
+
         bool success = exporter->Export(mFbxScene);
-        
+
         exporter->Destroy();
-        
+
         if (!success) {
             MString errorMsg = "Failed to export FBX file. Error: ";
             MGlobal::displayError(errorMsg);
             return false;
         }
-        
+
         MString msg = "Successfully exported FBX file to: ";
         msg += outputPath.c_str();
-        MGlobal::displayInfo(msg);
-        
-        MString openCmd = "file -import -type \"FBX\" -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace \"" + 
+        // export success
+
+        MString openCmd = "file -import -type \"FBX\" -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace \"" +
                           MString(outputPath.c_str()) + "\" -options \"fbx\" \"" + MString(outputPath.c_str()) + "\"";
         MGlobal::executeCommand(openCmd);
-        MGlobal::displayInfo("Opened FBX file in Maya");
-        
+        // opened FBX file in Maya
+
         return true;
     }
-}
+
+    void FbxModelHandle::addSourceBlendShapes(FbxMesh* mesh,
+                                              const string& meshName,
+                                              const map<string, map<string, double>>& blendShapes,
+                                              const vector<map<string, vector<array<double,3>>>>& distance,
+                                              FbxBlendShape* blendShape) {
+        static const vector<string> suffixes = {"source_L", "source_M", "source_R"};
+        const int cpCount = mesh->GetControlPointsCount();
+        FbxVector4* meshPoints = mesh->GetControlPoints();
+
+        for (int suffixIndex = 0; suffixIndex < (int)suffixes.size(); ++suffixIndex) {
+            for (const auto& [regionName, weights] : blendShapes) {
+                const string channelName = meshName + regionName + "_" + suffixes[suffixIndex];
+
+                FbxBlendShapeChannel* channel = FbxBlendShapeChannel::Create(mFbxScene, channelName.c_str());
+                FbxShape* shape = FbxShape::Create(mFbxScene, channelName.c_str());
+                shape->InitControlPoints(cpCount);
+                FbxVector4* shapePoints = shape->GetControlPoints();
+
+                for (int i = 0; i < cpCount; ++i) {
+                    auto it = weights.find(std::to_string(i));
+                    if (it != weights.end() && it->second != 0.0 && suffixIndex < (int)distance.size()) {
+                        const auto& meshDistances = distance[suffixIndex];
+                        auto md = meshDistances.find(meshName);
+                        if (md != meshDistances.end() && i < (int)md->second.size()) {
+                            const double w = it->second;
+                            const double x = meshPoints[i][0] - md->second[i][0] * w;
+                            const double y = meshPoints[i][1] - md->second[i][1] * w;
+                            const double z = meshPoints[i][2] - md->second[i][2] * w;
+                            shapePoints[i].Set(x, y, z);
+                            continue;
+                        }
+                    }
+                    shapePoints[i] = meshPoints[i];
+                }
+
+                blendShape->AddBlendShapeChannel(channel);
+                channel->AddTargetShape(shape);
+                markNodeForCleanup(MString(channelName.c_str()));
+            }
+        }
+    }
+
+    void FbxModelHandle::addAlignmentBlendShapes(FbxMesh* mesh,
+                                                 const string& meshName,
+                                                 const nlohmann::json& weightJson,
+                                                 const map<string, map<string, array<double, 3>>>& alignmentOffsets,
+                                                 FbxBlendShape* blendShape) {
+        static const vector<string> alignSuffixes = {"align_L", "align_M", "align_R"};
+        const int cpCount = mesh->GetControlPointsCount();
+        FbxVector4* meshPoints = mesh->GetControlPoints();
+
+        int modelIndex = 0;
+        for (const auto& [modelKey, regionOffsets] : alignmentOffsets) {
+            if (modelIndex >= (int)alignSuffixes.size()) {
+                MGlobal::displayWarning("Too many models for alignment BlendShapes, skipping extra models");
+                break;
+            }
+            const string& alignSuffix = alignSuffixes[modelIndex];
+
+            for (const auto& [regionName, offset] : regionOffsets) {
+                // Skip if region not present in JSON for this mesh
+                if (!(weightJson.contains(meshName) && weightJson[meshName].contains(regionName))) {
+                    continue;
+                }
+
+                const string channelName = meshName + regionName + "_" + alignSuffix;
+                FbxBlendShapeChannel* channel = FbxBlendShapeChannel::Create(mFbxScene, channelName.c_str());
+                FbxShape* shape = FbxShape::Create(mFbxScene, channelName.c_str());
+                shape->InitControlPoints(cpCount);
+                FbxVector4* shapePoints = shape->GetControlPoints();
+
+                const auto& regionWeights = weightJson[meshName][regionName];
+                for (int i = 0; i < cpCount; ++i) {
+                    shapePoints[i] = meshPoints[i];
+                    const string vertexIndex = std::to_string(i);
+                    if (regionWeights.contains(vertexIndex)) {
+                        const double w = regionWeights[vertexIndex];
+                        if (w > 0.0) {
+                            const double x = meshPoints[i][0] + offset[0] * w;
+                            const double y = meshPoints[i][1] + offset[1] * w;
+                            const double z = meshPoints[i][2] + offset[2] * w;
+                            shapePoints[i].Set(x, y, z);
+                        }
+                    }
+                }
+
+                blendShape->AddBlendShapeChannel(channel);
+                channel->AddTargetShape(shape);
+                markNodeForCleanup(MString(channelName.c_str()));
+            }
+            ++modelIndex;
+        }
+    }
+
+
+}  // namespace cf
